@@ -1,0 +1,42 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "value": "amitlamp"
+        },
+        "location": {
+            "value": "West US"
+        },
+        "ubuntuOSVersion": {
+            "value": "14.04.2-LTS"
+        },
+        "newStorageAccountName": {
+            "value": "amitstoaccc5"
+        },
+        "adminUsername": {
+            "value": "Amit"
+        },
+        "adminPassword": {
+            "value": "Amit@123"
+        },
+        "dnsNameForPublicIP": {
+            "value": "uniqdns"
+        },
+        "mySqlPassword": {
+            "value": "Amit@123"
+        },
+        "scriptName": {
+            "value": "install_lamp.sh"
+        },
+        "scriptUri": {
+            "value": "http://devteststorageaccount1.blob.core.windows.net/scripts/install_lamp.sh"
+        },
+        "scriptStorageAccount": {
+            "value": "devteststorageaccount1"
+        },
+        "scriptStorageAccountKey": {
+            "value": "QZVHc0mViAJFcy2EBPIpxXmOiT1Ogj43EHNNw3lbXdpggzG1fBPd79NyJQfHfXnAv2Nxg7NQfkvWyPjV+lCjwQ=="
+        }
+    }
+}

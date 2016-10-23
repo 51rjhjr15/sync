@@ -1,0 +1,343 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"newStorageAccountName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the new storage account created to store the VMs disks"
+			}
+		},
+		"storageAccountType": {
+			"type": "string",
+			"allowedValues": [
+				"Standard_LRS",
+				"Standard_GRS",
+				"Standard_RAGRS",
+				"Standard_ZRS",
+				"Premium_LRS"
+			],
+			"metadata": {
+				"description": "The type of the Storage Account created"
+			},
+			"defaultValue": "Standard_LRS"
+		},
+		"location": {
+			"type": "string",
+			"allowedValues": [
+				"West US",
+				"East US",
+				"West Europe",
+				"East Asia",
+				"Southeast Asia"
+			],
+			"metadata": {
+				"description": "The region to deploy the resources into"
+			}
+		},
+		"virtualNetworkName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the Virtual Network to Create"
+			},
+			"defaultValue": "adVNET"
+		},
+		"virtualNetworkAddressRange": {
+			"type": "string",
+			"metadata": {
+				"description": "The address range of the new VNET in CIDR format"
+			},
+			"defaultValue": "10.0.0.0/16"
+		},
+		"adSubnetName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the subnet created in the new VNET"
+			},
+			"defaultValue": "adSubnet"
+		},
+		"adSubnet": {
+			"type": "string",
+			"metadata": {
+				"description": "The address range of the subnet created in the new VNET"
+			},
+			"defaultValue": "10.0.0.0/24"
+		},
+		"adPDCNicName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the NIC attached to the new PDC"
+			},
+			"defaultValue": "adPDCNic"
+		},
+		"adPDCNicIPAddress": {
+			"type": "string",
+			"metadata": {
+				"description": "The IP address of the new AD PDC"
+			},
+			"defaultValue": "10.0.0.4"
+		},
+		"adBDCNicName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the NIC attached to the new BDC"
+			},
+			"defaultValue": "adBDCNic"
+		},
+		"adBDCNicIPAddress": {
+			"type": "string",
+			"metadata": {
+				"description": "The IP address of the new AD BDC"
+			},
+			"defaultValue": "10.0.0.5"
+		},
+		"publicIPAddressName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the public IP address used by the Load Balancer"
+			},
+			"defaultValue": "adpublicIP"
+		},
+		"publicIPAddressType": {
+			"type": "string",
+			"allowedValues": [
+				"Dynamic",
+				"Static"
+			],
+			"metadata": {
+				"description": "The type of the public IP address used by the Load Balancer"
+			},
+			"defaultValue": "Dynamic"
+		},
+		"adPDCVMName": {
+			"type": "string",
+			"metadata": {
+				"description": "The computer name of the PDC"
+			},
+			"defaultValue": "adPDC"
+		},
+		"adBDCVMName": {
+			"type": "string",
+			"metadata": {
+				"description": "The computer name of the BDC"
+			},
+			"defaultValue": "adBDC"
+		},
+		"adminUsername": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the Administrator of the new VM and Domain"
+			},
+			"defaultValue": "adAdministrator"
+		},
+		"adminPassword": {
+			"type": "securestring",
+			"metadata": {
+				"description": "The password for the Administrator account of the new VM and Domain"
+			}
+		},
+		"adVMSize": {
+			"type": "string",
+			"allowedValues": [
+				"Standard_D1",
+				"Standard_DS1",
+				"Standard_D2",
+				"Standard_DS2",
+				"Standard_D3",
+				"Standard_DS3",
+				"Standard_D4",
+				"Standard_DS4",
+				"Standard_D11",
+				"Standard_DS11",
+				"Standard_D12",
+				"Standard_DS12",
+				"Standard_D13",
+				"Standard_DS13",
+				"Standard_D14",
+				"Standard_DS14"
+			],
+			"metadata": {
+				"description": "The size of the VM Created"
+			},
+			"defaultValue": "Standard_D2"
+		},
+		"imagePublisher": {
+			"type": "string",
+			"defaultValue": "MicrosoftWindowsServer",
+			"metadata": {
+				"description": "Image Publisher"
+			}
+		},
+		"imageOffer": {
+			"type": "string",
+			"defaultValue": "WindowsServer",
+			"metadata": {
+				"description": "Image Offer"
+			}
+		},
+		"imageSKU": {
+			"type": "string",
+			"defaultValue": "2012-R2-Datacenter",
+			"metadata": {
+				"description": "Image SKU"
+			}
+		},
+		"adAvailabilitySetName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the availability set that the AD VM is created in"
+			},
+			"defaultValue": "adAvailabiltySet"
+		},
+		"domainName": {
+			"type": "string",
+			"metadata": {
+				"description": "The FQDN of the AD Domain created "
+			},
+			"defaultValue": "adarmtest.com"
+		},
+		"dnsPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "The DNS prefix for the public IP address used by the Load Balancer"
+			}
+		},
+		"pdcRDPPort": {
+			"type": "int",
+			"metadata": {
+				"description": "The public RDP port for the PDC VM"
+			},
+			"defaultValue": 3389
+		},
+		"bdcRDPPort": {
+			"type": "int",
+			"metadata": {
+				"description": "The public RDP port for the BDC VM"
+			},
+			"defaultValue": 13389
+		},
+		"AssetLocation": {
+			"type": "string",
+			"metadata": {
+				"description": "The location of resources such as templates and DSC modules that the script is dependent"
+			},
+			"defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/active-directory-new-domain-ha-2-dc"
+		}
+	},
+	"variables": {
+		"adLBFE": "LBFE",
+		"adLBBE": "LBBE",
+		"adPDCRDPNAT": "adPDCRDP",
+		"adBDCRDPNAT": "adBDCRDP",
+		"VnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+		"adSubnetRef": "[concat(variables('VnetID'),'/subnets/',parameters('adSubnetName'))]",
+		"adPDCNicId": "[resourceId('Microsoft.Network/networkInterfaces',parameters('adPDCNicName'))]",
+		"adPDCIPConfigID": "[concat(variables('adPDCNicId'),'/ipConfigurations/ipconfig1')]",
+		"adBDCNicId": "[resourceId('Microsoft.Network/networkInterfaces',parameters('adBDCNicName'))]",
+		"adBDCIPConfigID": "[concat(variables('adBDCNicId'),'/ipConfigurations/ipconfig1')]",
+		"adLBName": "adLoadBalancer",
+		"adlbID": "[resourceId('Microsoft.Network/loadBalancers',variables('adLBName'))]",
+		"adlbFEConfigID": "[concat(variables('adlbID'),'/frontendIPConfigurations/',variables('adLBFE'))]",
+		"adPDCRDPNATRuleID": "[concat(variables('adlbID'),'/inboundNatRules/',variables('adPDCRDPNAT'))]",
+		"adBDCRDPNATRuleID": "[concat(variables('adlbID'),'/inboundNatRules/',variables('adBDCRDPNAT'))]",
+		"adBEAddressPoolID": "[concat(variables('adlbID'),'/backendAddressPools/',variables('adLBBE'))]",
+		"adPDCDataDisk": "ADPDCDataDisk",
+		"adBDCDataDisk": "ADBDCDataDisk",
+		"adDataDiskSize": 1000,
+		"vnetTemplateUri": "[concat(parameters('AssetLocation'),'/vnet.json')]",
+		"nicTemplateUri": "[concat(parameters('AssetLocation'),'/nic.json')]",
+		"vnetwithDNSTemplateUri": "[concat(parameters('AssetLocation'),'/vnet-with-dns-server.json')]",
+		"adPDCModulesURL": "[concat(parameters('AssetLocation'),'/CreateADPDC.ps1.zip')]",
+		"adPDCConfigurationFunction": "CreateADPDC.ps1\\CreateADPDC",
+		"adBDCModulesURL": "[concat(parameters('AssetLocation'),'/CreateADBDC.ps1.zip')]",
+		"adBDCConfigurationFunction": "CreateADBDC.ps1\\CreateADBDC"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[parameters('newStorageAccountName')]",
+			"apiVersion": "2015-05-01-preview",
+			"location": "[parameters('location')]",
+			"properties": {
+				"accountType": "[parameters('storageAccountType')]"
+			}
+		},
+		{
+			"apiVersion": "2015-05-01-preview",
+			"type": "Microsoft.Network/publicIPAddresses",
+			"name": "[parameters('publicIPAddressName')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
+				"dnsSettings": {
+					"domainNameLabel": "[parameters('dnsPrefix')]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Compute/availabilitySets",
+			"name": "[parameters('adAvailabilitySetName')]",
+			"apiVersion": "2015-05-01-previ+NWºË™ªäÖ¬|Àı®ète4Øìß3"'eU"XÄ•yôFöéZ"MJÉMêf¦N§ÊfEÜVRºz9Éãq#(bÃº'z
+ ®dh¨h“é2‰"¼ FT¸ÂmãPVøa   ·sQæ då €À´Š*Èû!<˜1kÄdh¨èŸ'`b¢0Ğ4ÀÑ $P\pÀ† ±4~ÅU¶Ó2™kÜ*bJù½iZ®ËtD}53TqR!O×w0àÀOCi¼í)`]Ÿ=eNü:õÊÒ‹E¡şƒŠµ©R„À(ÄIv·[½UL˜.8^‡q)â³oœ /\|(FY'
+JË\N@\ ì¥	A`l„`Ñ	8ë"z•q;«G'C±Á ìPÍo¦7rjTbt›Rqä—‰y	ÄQV¡ÚTåÈ_ç¨Í)=À‡l.!á¡˜1Á³X(”œ¸È)DÃÌ¹!
+¯&z8fS¡0‚S,˜  \•/ğ@„äÉ -y€Q·FõÿfrT7DĞc æiÆ nãQØX1 £mª­µ°÷N\V·jPÇ¬Q6¡äl;m&=DùM?Nm§^càŒü
+}T¾*àçŒš/jNd”’‚æ‚ (â–‹ƒ@nÁÅ´#(‰'EÌé5	¼Nˆš‡ÀĞ<ˆÀ]‰ŠJ
+ÃB`B:eœTŒù¡°K¬£D0Jøh­"ÆJ€¡qD`Ê¼BYd½ëì5" Ã·È˜wƒÄL±¡‹LÓ<Áhj€T…‡é'Ì  ¨*£ „UL „« ­Êjï8ŞˆLmã’©z\­Qæ²¦!paÇ·i£{VX¾-ˆTæ”ü5/^Xà“.€q¢|İn™5	DŒ×=Ô‹JRNâ~æ®™öíIˆüU1Ô7C¡Ù$¦ÇÂ°`Á!‹Ä2YpÊªêØÉØ;KJ‰æDëÄbÒ"Z‹ š˜¤6)“‹@Ôä Jdí¢²±Z® EùsÌà/)J8’Ì(™ŠY’©¥õ³mZb
+j)™qÉÁq’ªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªª  T¾™2UŒÆ‡Œ
+ZÄD„Ip·åü¡GÃÿûâgrhÑ›x{ĞêíCox=£C­½ƒì4hu·³ĞG13ë”Æ¤(Œàb Œ*c-¥&CŒ‚aQ$ˆ|àŠ6¦q‡tqRÍ
+¨v„"ˆÒÒFR½İ›Ò©.€”R*ÊÄ=T&£<Ğ"Ë w2§´)\•¡ëšŸê%YÎ–DñgÄŒÔÿæü6Æ({„ñ:\‡õËYÑæÀ(ÔFét0^B–ÅÉ}µ…ÌŞoO@ÑÙ-”ké&Ëiá¤Òö,tb‰=$À†RG?¼æh33£“¯Ş©¦“¦>jFî&!(âD¥˜Ü¦‡Ü(NOX€ %7¦XîbBÀi]
+4D¤DÀÈTè1³2àŠ0ÑÜµ…¢†	XÀ@Gj‹9>EÏQº0ş
+I¡’æXÃ¥û	7?t²:¤X`:Tx£Ui:bÀ6™SÇÚ®JÑ#š—ó¦U^\Sá+XŒÍŒzÍ;ømŒP÷	â´Ğx³¹kµ#9ìµqún^B—eÉû[k×4SzšQáF¹;›#iá:M½qx(èÇ³¡F¦¼æh3?U'_½bB¡±óTê§tÅ•óD¥˜ãj(Pœ±P  +Ü·|‚eådBH6b '>º: :S
+‚yüÆÍğ¬„tpˆñ98ån1#P6†$4((“:”'ÜY|ˆÿ0‘  ‰hÊX„•$½X›ªÁ¹S«	¢°½ÿWÎÂ<,½F\Ö¾­Û¬Î°±Æ%yR)ï†3yCÅ¥™û<•
+-q]¸E´Vx½³Ní"rã	r¶×¤S¥c;àÎÉ]wÕ…æ³û˜–
+iW¬\Q^¡pòã%`õ!â¦MàuE95VVÖ¸”¹~f´äã¾ÊØRF0L„ó)8Ä£   7¾îøôËJ8(ÈlÄ Nudd ,p*¦06ò!ğQù›ÁI èáÂraÊàbF.˜íøp° X€(u(K¸³<9 #ş(æ
+8-¹€2–FÕ‰°¬•:§8DŠ ^÷}_8ÔhYz±×U³¬Ö°±Æ%w#
+{ÈÀŠo/èc¤³3³É<(µ¥váU|^Ù§v‘9ñ„Úæ-.Mi3¼¼²W÷Õ“Ígû1
+iW¬\Q}BáK‹JÁéÁaS&ğ:‚"•K*ÊÂõ®%.0ÌÎNJ{#aIÀ¬‘æR8Ä£LAME3.98.2ªªªªªªªªªªªªªªªªªªªªªªªªª  ‘Â$0UÀ0C€$q¿”ÿûâçhÑoO æM
+3iìØÍ£@qôÃá4h®>˜a„ªƒ‰ Mf.2lBM­„
+L¤–°@I0ğ0„‚@ÓÁ:ĞL†6‚KcT/;5$	1àµ501¤ôõhÏ+s_KÑs£äYÙ˜ˆ7 ‚èQà°OÓ&& –¿Ä@²nÌ²sr©šãeª³¦öªéèÊº=õÎ*ÅJk0Ş®;´D¤Ú4`†r5±@¢?•Êú8FˆÑ/’úƒKNºÜµ˜`i¶Õ!YB$•LY,ñÇÀ±!©¤gã¢¥¤-hFiQCÚŠR’$Õe”Z  }‡I)L”€C 0	Ï`bÖ)Që<ab†W1äN‡h-?^iÅ|Áƒ “Oa  ï„@ v@¢`£‰Ù© 3,t€D‘CY-’tÙó4eiÑ.N°0@œ/'ãºåb²µ<U„üW¹®©ÕYÓ|
+éèÊš=õÎ*İJkğØ£ÀNíI©i9CùRØÈÌW+é5%‹ä¾ ÒÓ·G6Š¥
+KÕ²r˜üñpô‘l!ãHU×z:&<JdóhEÕ'Maª±
+÷—ÂaÕËY¨jíW\*€ ¾5ÏpìP‡•yÊ8¼ÄZÊPg ˜¦¥,€â€´î	d´D ĞT¹E /€á-Ñ9Qåä£À¾)*d[¹‡D.ÒÕÈ0¥`b)•…É”Ä›ƒÔôÉUM¨¼)ê®]Äü-‡Ú*İĞVN™"VFO®‡Ê¸Ë\Ëæò¹ŒòLj¸Wrn}|dñÃ­]ìh1Òq¡Bl¢ò6„„š³º„êW¹İ–2j‡Ö¢@dšFKéX{-4í(Ù…j…t~;šiõEu*©6¯›Üˆ¼š0£é1;ïP«‚^ÕJm­óævŞ±î‘j×w§«Ş°Õ
+  /cÃB;T!ãZr/1Ø2”È&)¹:à8ƒ%?„BD™- Q.Qh@DÁB3UIy+BÀeL—u0˜…Ê@Z¹¼Ä€,Y‰4‡©ñª›xS%\»‰H,[”µãAY:…!´ä‡®‡Ë–¹kŞ:×1@ÂéB=sÂäÜúøçš5w± ¹¢ã>„ÙEãÆƒ”š«„]	:”lğÙc& SDxÉ4ŠˆúVËM;J6H­P®ÇsM>¢È®¥U%¥âS{‘OĞÛGÒöß7øYæ[U)å³æ¬½‡¹1ªµî«ğm­15Ì¸äà¸Êªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªª  •¾ÚÁƒ•“BÄEFAœgf©Jg@TÿûâçXhÑ[|Àñí#ko˜¡¡>mñöƒÓ´'Í¾>ĞdšPhJ1ï† Aƒ h|à¥ªP
+* [P¨ÀƒÊ@¶Pı¥:æèöt¬˜—»¥@S!IS$I]Í#@h¹¾8mÖIâb†=V5aÖ‡(ÄGr©Í9›@ö³8<”/ ½«0ï~1 ²Ñ½aı±<cÖq´Õ¶§•ü~¢„¾Ê¾&9¸Ï¸ì­ÉöQá˜srx·OâÕ{2]äCññHöÛq¶Xg÷jJ0Öûó7l“O[G‰$?éæl”šÕ˜»…ŠMš^{BIk¯ë  ^¾ÚÁƒ•sÄEFAœgf¡Jg‹@Tdš0hœcß@‚† ?P1Pß
+P
+2 [Rë¡
+:‡í)Ç7(‘3e`ùD]ı*™JJ™"Jì~iuÍğ‘¿î±(1C™†¯4èq%ŒATw*œÓ™´»+ÁÔ­´Õñ‡rñXºoh½¢¢à¾³Œf½\ÄdU;•_”$Ê…2(¿$
+=ÇV©vPˆ•²­T¬A¶á”Ÿ«ŒÉw‘ÇÄ1í¶ãl°»ÅÚ’Œ5¾÷2ëdšx±£¼’ü	KócºRkVbzî)4n{Xö×_Ö•ª€AEEB‚Æ,¹ĞÀÆ µåIfX7W¦pZ	Aà`¥€…‚¡aÆe2—J¨KÎ„i¸Åƒ€¶Æ@cÏñ”ÄÃ 7aõXû˜xHmQ¢¯"­iÒ{‚Y´‹S©yA X2ça*¥ ÖPÚÏ¶×v€Ü4Nce±‡u¡Ò?­ö¼ÆÂ¾w×+"¦ño¤\Tƒœ°¤,õÔá• Ã­õF3Z1ã¨põ0i-!•Ñ-¬œğËí	ôÒåôxé(mìŸ5•=ºÛyoŞ^ÍœB8jÍMkMq 4êµ¬ø˜Ê$íûYŞ•NÀ ¢Š"†¡AcE\Æd`GãZr¤³,«Ó6+¢°0RÀAƒÁp°ãF²›Ë¥T&g:4ÜÀãAŠZc	"2WğË"@°úª¡}Ì@*6xéWUŠE*M1ĞK} Å"ÕÖù1 82çjUf²€°¤rkA0¼k´áM?ŒöV†‰æ_­ö¼ÆÂ¾wĞÈç¶-ô‹Š[–‘åº£qU!ß[ëihÈİ^ú‰˜:–—)œ¨ù9á’ıÚé¡å]:I“æ²§¢o-û«Ù³ˆGTT®´ÖòN¡ÓSgq1”<IÛö³½15Ì¸äà¸Êªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªª  
+µøyÌˆ€ q;@Æ ¦ba„n€ĞúŠŒÿûàG„hPy~÷í	óoŒº¡£DM½›·´i­¾Ğ“ ‡™¸Réé®E¢$äÁ2“  ¯#*»„1÷D SúŸŞ¨	u‰Ú›˜pÁF¡HñPúÀIQ!RYTıq! 4?ZÎš*”Äf)ö\3E|4Gƒä#Mùx4¦6bfKî;çŒ‰^Ìêöp©SìUİôGş­ğ³}¶Ê6:~‹[bŠßòD¡ßFb;¬¬.•¬Ì,İ¬Âbc1#Ë
+uı–y	ÖãD–8LöF?ÿ®jwŒÚKæ,*a?´—şà  ]Ç\ÊŠ	‰ê@!	0\Ó+iÅj&*<$Dnh"
+jd€zb@H© é­)”MÁåXĞƒ¥kdáa`HÂr…€ÎRç1°cÓGæ0"hÅ@Æ"4wÓ"J_¢â<ÒYTıp¸¤mUªšwLdª€”nµçK¹³LŸ©ÁLê^›»HŸ×š­×±ŸmÓX–G|ôîyNbÑrx"ùÖ±OøÍµ­ ´€Ò‰/Õ/o.êwïœ=¾~,GVX+H(¦¥âÃ'ÉWJ<t¼0mŸÁcËEgœ…rvì,_ù$Í^Ğ_]jŒö’ıÃ[X.¸Aš‡
+…:A†AD®Ş!`Hm††‰®g	sÒ! €&ZÁƒ,mÑÒ_•a·àîˆ
+Š9d™	^IZ"ø&]Æ%9m’
+ä}sZ~ªtt>Ê½¦.3,ùE•‡BûåNö;ß(\võyãÊ¼]¥ñTt Íôñloq	ö(Ì¤o4Ì¶%CÃL¯"±Hp&ÔFåV¼­st´ÍÊûœ:ˆåá s\hÌ‹f›
+âq4ÈH:d ¬¤z:Î–™ĞıëÒóÙ¥ær±·C3Wmı{ÔdU! ¸ì%øqvd2zDÉtWo@HÛ±± bCÅ„¤ûZ†œ:E $iÂA[´ f¥ãá€Ğ.W 8 „bŒQÒOÍG‡¢(^é ¡‡«ìne-VSo
+©öãŠZ­ˆÙW´Å“0ãUV(ß2ßeŞÊÙ¼Uç*ñ½¡E(çûÈßtr>ú3%±*e©”2><ˆb22pàM©Œ(zú­yZæéê¾$]Ä‚+¦$0ÿ|°i«‘êÉV…:IB-é%ƒ­Lš.i†T!NÄõ_FyïKıbNÄ°¨g||V<::û¶ÿøªSSQLËNŒªªªªªªªªªªªªªªªªªªªªªªªªªª ’wÉ›Û'JÂ†^°R¯KĞ¹K÷
+xZ”ÿûâ€Ñm×;I~°ùºçi/ÖÙ¥[M3æ´kõ§ãl;<LÄ¢9Jé¥2õ”RÉZüºâ"$ì^ÊW÷"	a«5éû¹M¾#İQZci&ˆà%"LÛ- lÀ¬ÉpÙè<!6€ò‚Á´m¨Â€ÑàX	åŞĞ`"â„&´‘NÆ¬E†Uf”ò!SÍ
+ã ç_Q¶/Òt[PæSãR‰æ„ñctaèŒ5áÎ~Ãxé&dØç”\¡2Ş-€°ÓqXPC‘3W“q4a2×i#!½O$øv‹‰*<VÑg±ˆ[ÎÄ’gz¾qõXüp0ÄÂÑç5 I9„dÍİs†%R‡_°R¯KĞ¹K÷
+xZ”;<™‰Du+¦”ËÔV1K%kòêwˆh“±{)_.DÃVkÓ÷r›|GºZci&ˆà‘&>…´˜™."R&ĞPX6´(ÀO#{@ÀEÄMHP§cP"ÇÃ*ƒIùÆóB¸è/ëµbñm ÅµeE£Ø…ôº€ÿ%ä-X>•Åİ8–-Èi¾c'ÉaD'¦R²Ş! TSqXPC‘3Q”â¥2×i#!vu¢|,¢j>´Yìb³±$™Ş¯œ}V?0¼-ŞsP M¦ÚSSåfôòÆ0!“©+“ÑÉ“µ×åõ£°Ô h´¶I©D²†îTõQÖqšÕ;ºã‘]±WõÙ¹QÊÃeO%wg~5{-?^`&Ú‡I#FoÀÚ\?iYI!¹ÀBR}kÁ	Dy,&qÃƒ†Ö­ˆéâË®DˆCiæ ;=1://+¶¥…–t±6Caª&9eZöK»1&Ñ—<MrzVd¾‘£ÆcU§ãrÇ­;R'+3h@«!‹dwæ‚¥²©CCtŞ¨5ã/3¶ÒCĞ˜ÑWM’6¶êvß7…peØ¬7[Èh7cØ—…BË_©@ I6ÓLD%Î³RA©ƒ0eàäÉÚëòúÑØ|âÒçv6Ø.CHıTõQÖqšÕ;ºã]±WõÙ©q	ea)©à×vwåW²Ë÷êÃá¶Ôblœ•+ï$6Ü3Âv¼Ø¶Àb¤Õ¯‡‰¬vœ	(‰Æõj¶f(Ê˜›s’
+$&¶¨Ğ°ÆÊ­W$“Êó~¥â²3)á»5¶7D]­ª·ğ
+fFrú¦/øî.	Ã4J3²ju™Õì…ì•Í&øAQ&À­ %°;‹ÂNó=QYTa¡·7Áñnb;l\6†]6HÍl"3Âá¶w…Z-g}òÂ÷©;ëLAME3.98.2ªªªªXLÌø[Òd@4b¡	¸#WêLà·vÿûâÇ¾wSoâô¯ŠamãÜ1ıHM¼Û‹Ğ¿©¶©‘äÁñ6¹z	ŠÊSMØimMŠC•Ø8ÚçAYô…X½›§"$±iö ³f»öˆ blkxªNÂ€ÛåÛR’*¥—¼+›ÕëJÔ\œ˜U–m’iâÑÊïª…>„Êª‘‘•ÍZJYªÔÎã¾Â—å‰•¢¯Ÿ5ÁŠñ=
+2ìáº-Ár¢qI£’ïœ’jÔM©«/:Ë‘~k0âBd®YIPM"ÊCÌÉ-°`8¶®®~íFYr;¢&•kL4SÅab•ÇN ÊñÎâƒ5$$F-–Ãe6‡ˆ7jD¯õè 0;3ánF1 Ñ‰„&àŒMt#©0¢İØ:G“ÄÜKĞLVRšnKjlr¨şÅ£®tŸD5‘az_w4e"$±jš³f»øˆÈİFm±ÁJ]òí±IRËŞOÎ
+ôiZˆS“
+²Ë™&.œ¡¾Š…>„¡NÕHÈ­sV§SVjµ3<wØRü±2´Uóæ¸.,	èQ—gÑn•ŠM—|ä“V¢èªmMYpë.Eù|¢;‰	’‘e/ÂYvb#Ğ“–°"ÁnºwjõjÌdVšÜÑOµöbêjËH÷© q"[,%†Ê(m*·l!Fk’€„lÇ§âìrEüFb…Æ*2»Ì!Èht­Ğp|Hı|Gİv~ıFÒ!¤–´xœ<	—>–‘˜m£ã˜(İï«©\ÍˆV8‰’x-&ğt9=êŒg)AÃˆ~®²X0ÎÏE^‹{¹°³Q©ÕR¦gêåè¦õëE{‹%£) ±?éÈikÊäö•9‡Fç§!iEÜf«¶ÃC£´=`‘U¶´6etz)U<K;*¦[ÇO¤NWª@á#'K	lJ¨ö51L¬Ç3ã™¦u–7%K`ÍHfµâç½;KÈ|ÏëA©ªoÙ['Ö·1®â›"	÷»‘A¿˜¡qŠŒ±3r#İ A+p;_÷]™¿Q´ˆi%µ'DËŸKIL6Ïñ®;yñÔ®f‚(8DÉ;Ö”u‡-C¼ÂVà³ÊÍŞÃë$ÛLÃóú8¤ë1¾nr|ÁIM‚Ñf%äá9ĞvôsÖ†jO,ñ)“¥üH¢reÃ"W[mÄÇ±’q:TÄ³®•±)ô§½EˆÉ‚8äZœCŒô²Ûï’ÈåW©puI§y‚j-eki"™ ”J\%#aõ)ŞRÔÖ*1Ö¼Y´ôìŞ’È|Íõ ÔÕ7‹lÏ-“ë[˜×qLAME3.98.2ªªªªªªªªªªªªª $[n™BPcpĞÄÃa3Œ~BèV„Äÿûâ ÇdiS;Œ~Ğñ*SqÚŸIN1şÃç´hÜ=à×mFJ’°ª‚ÀÖêõ“¦€=I \¨†Ü+Qvµ)€Ğb]©MÆ‰@ÃA”n•BšË®ü&	,«AÁ!¢)?0áŸ¥%ÄœÑ¶½ÿ/ªZlúw‰WŸ%}r«-.Ğ›aÀJ8(,^bá±Y–¬?X•3´¦bJòR•xn­r”§çN°pú&`={ŒS Ÿ#:ŒI,!³>ã¼t«(KuÛ¦é`5K0ŸÂˆúhp¯²v²©p†ÊÂäİ´{jÿøà)'ÁR1øPX‚b0Ù„ˆÆ: âÙ~Ä@cyµ÷@I@İ"^kTİd}‚àA :]ZJ	¶j.Ã¢.˜ 
+]¨Æ‰ACÀM&ˆe¼·e‡ÄÉ…Ãá%a5pu.a<™@¡ ÎK¢©Í/oúbÃj–›]sÄÆ«Ï’¾¹V2]¡6Ã(à ±yÌFÇLÚÅ¯23´¦d—ÉJ_Åj×)d¶tëEeÇ`={‰%ôÒ3¨Á¨ø„;f&>ã¼’«P–ë·MRÀjG,Â
+#é¡ÀN¾ÉÚÊ¹Â–([iKjòÔéã©  
+Ncô\Ô†êÁH€,x •…y'j±+òbS*?’)d•éî4€wL¦Jà¹®l¶†8‹l†®­ËD`Jwªfqß×ùùŠÓÔ¹z"ñÀ1˜ãp¡·²m`tÁ]Ë¹ùª«¹»±¨(–¼Åhä¶—?=>mó4ËŠÄ¢¿2®…ŠÅ’©24eå©ÙUIÇæªl10…ä!=ËÊ©MŠ„££§±y‚ãÅEä®²ÛKÄæ3T®Z+^„á ’&(ÄR’&Ç3•a=mP$‘¯Ü\¢å=†*KœGq³öS?ÿı  	.˜›1„> ˆs€Ás€@pD‘#˜KNiäC’·ADn%ÓAµDu9†­±Q+c¬V[z˜Ôa2œ)å¡xC=šÒC•KøÑMÒîv¨MÒî0²±D^Rá! Âl„¨ÄôÈLš*ä‘şÎ­z=¥ÙÕ¬Ïã«ÛŸ)“ÉıAs¢¢±qÜ›»]=o‚å$(kPªä²ò]µ/Êî%šØ`¸HÀÄÄùÊFucæG$’üW­p¯( @Wœ®/ïÚ¢¢bx"”‘*ôî9œ«	ëj$~Êäã“úÌT—8ãgìºŸFÏïwc{SQLËNŒªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªª  S¼.a1ò³L*4ÇğÃPÀS–qÿûâÇLhÑ›ybğç­3o,^E£Hu¬ Æ´iµ€ 8“Ô öÆ>¹~åjÌİè›Št;(µ3E@#2/ƒ {m²Èœ3‚‚â‘z–fê¿ë>K‘>®ìş´xpfN C"¨âè]5V%‘A"¸tD‘ƒ"T¤€4oñêÄòW+
+È¼ÌD" ! [W:‰Óˆ¢BBh¦"÷‹ M³¡ÑDuXíåİ\êãÃƒ©Pj"ˆËéÎI¸p<-E3bĞŠÉHZ ß‡œvH~Mq‘Ù|H	R˜¶²îï&*!˜êRÉ|š‚ 9Áã`µÓ+4Â£L}50Q°Q àyg‰CBhãë—îV¬ÍŞ‰¸¦£²‹Pš*3"ø2¶û,Úã8(*)#©fo}g½”±iêäÏëG‡äà%G&át²¬E‰aÑ~TH‰K¤{Q¿ÎÑ¹;:!‹Góòa@ 	 ‰êW:DŠéÂAÑ!!2ÔÄ^ña§lèt4§Ğ¾]ÓçW.—“ÉÏCN¡T÷.-EˆÕ*&ÕZ”oÃÈN;$?&¸ŒœB6_CS““Î îù’aáÇR“KäÔ*n}˜^ÆxÑšì\sE XJîjI–($ı>ai½PÅ…`l±?FÌïªº!c©y¢¬áıa¯m,·±:T§jQˆiõ³Yù­/k4ĞÔ¦‰È•¹ÖéµHg)šj®4	VkRj­-hTø\§æ­MØ’Çf'©ç#ÌŞü?)äº¤·ï|û5¹L¥¹‰<§­®2~À]*8z¬İ£/\ªƒ,µ¼èV×³Ûxã°C^Š?1j	Á2ú:z)DJA¦›»vf’Ô¢Õ$*?¸Ü¾1‹Ê±—FtşîU•,o¬ã«—{r#f§ d/>‰Ì/c8hÍ	v.9ƒ ² XJîjI–!$$ı5ai½PÅÊÀÙb~™ÇZhD…$<óEYÃúÖ`êYoetª>­Oã”àÎÍ4ÚÚåÊ5K8şS¿”°uèÌå3MU—@•aöU&¸µ¬³i~)ù«SslvbzW9fôoÜ§’ê’ß½ğsìÖå2:–ã’w‹M–/ö´^*8z¬İ¥-ŞTú=ZŞqÇÕ’ö{pv8ïE!ÙuÉÿÓßÎô¢U9.­7vìÍ&R‹T¨ßL sğä;•c.Œäşç*­)ãZÎ:¹CÛ‘58˜‚šŠf\rp\eUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU 
+$&–Ôéæ @Ø†CˆMì©4H00( ÿûâ ífRs  ÷ÌÊcÎ` ¹³[=¦ †6kë²À ¤\AÁ³ Âb(ëæ7™µ© Áx‹€‹|!@$£C‡Òæ³aFrƒÍC²…AgkoXÏkÿ^+)š]Šê\ôÊ›ĞKZÃv|­E›¥X23A?-p§ªU’¿Œ½ôKçb®[ÌÀ¦ó•ÒÊjÉ0›‹7•Ÿh+cº¯vİNõ±rK*ä*=MYÕ…Z ¯ªìÜë[ÍDeùÈù13]ø¾ú8P¼$õ©ûÙ¾¿nÒŞ›Ê~~íË]iûõåøJr¯O‘ß¯~Ä‚/.~áÉ›4òšl3©Í_ıßÿZ €Q%6ÿÇ!- ª)”2m‰@ÀÀ9fƒ¤•à0@$1ƒCT0z…<Î¬êö(w©	uÀÂ2Bpú|Ö|T<¬3Q™…¹gt¬Ş: Îkÿv[)š—]ê6ÊåKq· –»Tj,ğ]ƒ)h'å®õJ²Xq¯Ä$ùØ«ÿ2©½×¥”Õ’a7o+@Q8­á7v_EÉá›™•rE¦¬üÂ­PWŒÏU†j_ağüz‡óùˆÍº–İT÷á'¦§µØ/OÚ[ü¤ok?-iÒûóqz‘œ«Êßyú÷ìH¹s®üLÎÊâ4ØgS€"Ô¹áV‡ ‹8Pr Mr»v eU¡·´‚„\Ã€P{2,XN,Š
+¥¶ˆ T`”„{C^ÂÄ±œğ±a= àKFXÅ‹Ï İ	QàîMhí§Š£¹L¶¡RrBeÙVLezKÜ:C&Ö¦7¬RL\­Ô21Rc9LÕ8urxß&Æ¶ˆœI8FÅnHJ:"kÈN%ÔÈÒ´U%â¤E’Ñ:0ÌÅ…eEWåªÍˆ£ºHÏÊŠUœyÉHD-ÆõQÊ¦óÜŸŞl£+T­ü6Ó½Şî 9ZM¤¡-±BgFÃÈ.ìEÚˆÊY"Vö¡À†ƒÙ(±b`ÜPU-°¼E â£¤$ƒÚö%Œà{ î±ÁÜàH%£,bÃóÃB˜7Hl &´wÅQÜ¦[P¨¾HOì»*ÇFW¤‰|K¡<híÖ•”V:Xy÷PÍ’Lg)‚z¤ç>OåƒqøHm´Ø’p‡nHJ:"iò‰u24«Š¤¼BTˆšN!‡F9˜°¬¨ªü¢uY°ÄGHñù!J³1)£Ë†*Oš;É¤şólqÃ-!EG{®Rb
+j)™qÉÁq’ªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªª  A„¦“iÌ	0i32%D/Ty­¶ÎU=#×fÿûâ ÄhÖëlÆPóMi˜É]ÓS-¼yÃÈ:je·8—Â¹|6ü½«A=^OV2çÈ‡úï#o³PªêÈ¥Ñ˜~áºõ¬§-FM%¢\S^xåÃ÷LZ£ËåGÔÄ¦F(›åXNRÃï£>?65x²ú¥ºñâ¡ÁrS´æ%¸Ç¨V>İÊ†ñØŠs'–’iñ“±P²Oh"C:w—JPÈ‹îØ™ÜÜ)¤Ã¯UùD±Ç³P´wiÑ•êbáÒ´|Sµ|«¶E›ùB¿&6ÄÒBH°tïãy\iŞØÙLË+‹3Çşäİw¦•†­89Ã"Î²ÎÀ-<Û¸SÈN
+K2Èˆ0jÎÜ[¤‚ìÀ²øC÷/†àW¡÷uh'«ÉêÆ[<Ø«ò6é5
+­¬]~îÛuƒå¨É¤´K‹ï9pıÓ#Ö„gÄñğ¤¨û°ØäÈÅIÜDl
+NÕ›‰ãğ´ø=V©m^P¨@\”Í9‰máêŠÛ|xŒCïÔ&SòÌŸËw*Ã²èzbıD—ş³6¡‰9M…Ò”2¢û¶&w6÷4˜uê¿(–8ô¯õGp­^¦.`ÛFÊ›«%KÙ;¹B³&Šbh‰$X:wqu:­:@÷³ö`qf`ÿÜ›®ôÒÔå  
+‰g1“Ó¹^26š"/Ú‹ÇÊ&Ï8¨â³Tz%&ƒ%Šl#—”UÜ—¢-7“[»)jOô•(Ø×jØGKÇ-2ª7–à´>W¸½Q8`Ã.‡B‰&³iä¸™|Ï4šB`·#êæÃŞÂWµ@P¸"mªu£¹—L¯b6ÇŸYªtáfª±DéY­¨C<6x0ô4ù¨ÕËÖß-'¬r$#YSw·]¾7–Ñ¬eù\™l$C¸ó,2'XÙÕ+†Øî.gâiÓÄ¼(Ù”R£ eEy ;¥`9ùS2]œŠ\§µ`÷k’Æ:˜¸  ‹.c'§nÀem4D2_´\j/(›<4â [ŠÌeSRª)#$±MÉdåäÄV÷ö—Wë¼l¥©;RxbTÎŞŞË"†$UZú¨Ş[‚ĞùFÊõpÂ,üP35å<L»ÈÒ¯™ã&“HLä}\Õ½ì%zôE`»<ÚéÚ¢VÌ¡V¼_Pê­B_UXªtóu‚¨˜àÈJŸ@58Ù(¯K³-'¬h$¬†ÃvøŞ[BXËò¸ı™lÂìc–Ö6uJásÅÌã\M1Úx—„-\¢•*+Íİ+oÊ™’Ær)T§µ`÷k’Æ:˜ºb
+j)™qÉÁq•UUUUUUUUUUUUUUUUUUUUUU € ¬+=8| Ì¤c„†H£Qİ™c¸âÿûâ ¸€R³ŒàíÍ*vmìNÅ¥SMåàƒŒ4)İ¼18RDÒ¢F¡Œ#*°Ä™-$R^¬J‘4‹ò’ªMÈpå: ¶6¾î!U3@Œ>Mß¹Åd4°õ,ùlÜÕ˜ÌÉ¨EÑÌÄ‚l	‹4 š²¢ÇKeÂºQç‰l˜•Ñ´uéì&DæĞßŸ!‰ï:óƒ‘(œÚ¶Œ˜qõºÀb‰a8“†T•O
+éLO^\M5<JmµL•®Z ä]N«XEM&3JZ*_„"<‘}B|õ5Ö¬.qˆ—¶ÔL½HîW}ì¨æÌäZ²ÍwÒöñÕHÂ#V3Şx·Æ`e%ƒBƒËÅYkYø:‡ŒcqÌ˜m¯¨iWŠ†rôN€‰É7CÄ±°&ysFÙñX¬?dø*T­2uY¹¹e˜•™“P‹£™‰uP„t{@j!ÆqGTË(ŠéGÙ1+£€ééì$¢rô7Å¦E"ğ–ò×œ‰BSjÚ%0âëu€’‰a8’‰BÕñá øªx9¥$–^:MOšÛ^tÈÈğü­rÕ¢êtZÀ:*i1<º?	ˆWÅÂ6#ÀYGÔÏ¦ºÁõ…Î0‰{i¢gÖ{â'‹›±¥’õQ U@	nIÌZŞHMQÑlåai”4!˜:XZÍ¤Qu!¦|¦œó´N²(B˜òR©c¢¨ÉpøAI3cóO…S¸Ô­)3*áÚ‰>È†	¨äƒô»’ƒ¨¼22+ÍïVa0ªa¾MóI,Ï#ÅÚ cL$P…K|)ôV(­Íªd–àÁëÖ·jÖ'ìg,Øc†°ÖnèæŒÌ˜K1'W,²½Äux¯;×©EF¥W1=Rí®%0ˆ8’‰
+Y:]2£¹\ºc„ÔÈS5®aLÕ:é%êLñngI1©UPğ  ¦2k“£521 ó9(M"QC	`“© ½c2U=7ïóúõİn³õcï
+5õ‡D’¨™´úÑÀÌ‡3 R ½1/Š÷ÇK>Â2©«ˆô¸¨œK,€D
+ €2+		ÂÇ -'ZjÑÈú¢(7Äcø+•ÇÑĞìN …”éDeÎ•L”¬BÃ¶Y}¶Y…å©Ÿ^$ö'º„1Ç‰Oš$•Oa[“Ÿud­ZD,t&GKGŸCr”*ÅÀN5&Ä &!&_hHiZè#B^^u’øúÒ²òs•Amú˜‚šŠf\rp\dªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªª  ˜Ø¤‚LÍ\Õ‹Ì M/ŒÄ8X85•¼O#ÿûâ'hhÒ›xzpæÍSo~E¡BNa•›¹4i·³ ÖÃËdê³š­aÅ‰¥³Úü›J¦îYì%­-#:aªíã† @h4´.hı¤i±„vÅbXÌ’ºS777»CŠã©E«²ZÂI‡ƒd–IVöqBŞ³=S® ñŸ®Q	rxõi?fpŒ‘j†ş3SµJÑÃlÊ1§j7PÌ³!(jí½_™[V)Zc®%BÑèpdTõe©áÙåS¢Ñ@ÔğçOhš9It‹Š•>¹Ò•JJÂä†¡)ëáÉqK˜—Šö§o¥`h  ”Ø$LÍ\ÕL M9Œ¼8X85•¼O#ÖÃËdê³š­aÅ‰¦SÚü›J¦îùôeÅ-#:aªíë† Àf4´.hW²ŠŒatVxlÊ¤Û©vŠ%557FşB%Îó¸ñ6Xû-”²HaÔU“Ë.Jd{)ÏL–•ËÌ…ï—	Î bPÒ¨9‰ÃIIµï!#,–ƒØ¼øÄÀ¬Ä™«‰¤Ôí¯uq%ZÃ…¨ßI£øø¾ƒò‚ÁfL,ä§xâ¢rå.ˆG‚+ƒÄbQ¹uI™¨œ“MM!Jñ4²ey#éuËÕ¢¨ÛÊ± 4Í@•vbáÙ Ïæn™NaÁ!…BÎUeÏ($3Xqß ĞÑX0H`Æ3%‡Ì72yˆÁàAD,^¥ç`üZÿ 4B´( íA;BñG›ª%QH›ù‡%TÏKŞ„äi{Iˆv”il©(dË6e¦»pÆm‰©Wz'#Œë”Ä¢ÌÎ1BnM)£%šz;1M@ğHÿÄ¾ríbõÖ›å5ªSÛò5‡Oœ“]²JN¹£®« 0 õÅ=ï¾`É™TÆÅæã¼UrÃû‡'zo´p<ºO£FY[ÖÒ¼ÄgÓÚtSîà«©ŠšzY ™(‰„(#¶Ê]'n\Ö˜£kã	­L!àÇ D
+e!f2eg@à" 4AmVšÀ2Áa´(ck­Šƒ—ö3Bµu	3	¹šg%õc{$(Kí#t´
+A©€ÂÉ\X(J}ƒi$µÒÕø-ÌÈ¸dà?H0ïÔyYŒ”ql|ÔˆsúV?p•©YõKKøÖµ9,Ş#u‡O˜	É—¶$”*JÍ=V40hb±cŠ£VøÈ–8‰-MÇxM¢XOl
+’<Ä„n—y:4dÕ±m+Ÿf!Ú¦ ¦¢™—œUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU    nóIÿ  S!À§ÑâC3mG€ï!Éÿûâ
+§^gÒÓofBíLúZmìÈ^‘›HmåïËÍ³hÍ¼²x –_Õü±İIµ²

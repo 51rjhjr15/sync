@@ -1,0 +1,87 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+		"newStorageAccountName": {
+			"value": "amithadteststorage"
+		},
+		"storageAccountType": {
+			"value": "Standard_LRS"
+		},
+		"location": {
+			"value": "Southeast Asia"
+		},
+		"virtualNetworkName": {
+			"value": "adVNET"
+		},
+		"virtualNetworkAddressRange": {
+			"value": "10.0.0.0/16"
+		},
+		"adSubnetName": {
+			"value": "AmitadSubnet"
+		},
+		"adSubnet": {
+			"value": "10.0.0.0/24"
+		},
+		"adPDCNicName": {
+			"value": "adPDCNic"
+		},
+		"adPDCNicIPAddress": {
+			"value": "10.0.0.4"
+		},
+		"adBDCNicName": {
+			"value": "adBDCNic"
+		},
+		"adBDCNicIPAddress": {
+			"value": "10.0.0.5"
+		},
+		"publicIPAddressName": {
+			"value": "amitpublicnic"
+		},
+		"publicIPAddressType": {
+			"value": "Dynamic"
+		},
+		"adPDCVMName": {
+			"value": "adPDC"
+		},
+		"adBDCVMName": {
+			"value": "adBDC"
+		},
+		"adminUsername": {
+			"value": "amitnatm"
+		},
+		"adminPassword": {
+			"value": "P@ssw0rd123"
+		},
+		"adVMSize": {
+			"value": "Standard_D2"
+		},
+		"imagePublisher": {
+			"value": "MicrosoftWindowsServer"
+		},
+		"imageOffer": {
+			"value": "WindowsServer"
+		},
+		"imageSKU": {
+			"value": "2012-R2-Datacenter"
+		},
+		"adAvailabilitySetName": {
+			"value": "adAvailabiltySet"
+		},
+		"domainName": {
+			"value": "amitadtemplate.com"
+		},
+		"dnsPrefix": {
+			"value": "hadtemplate"
+		},
+		"pdcRDPPort": {
+			"value": 3389
+		},
+		"bdcRDPPort": {
+			"value": 13389
+		},
+		"AssetLocation": {
+			"value": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/active-directory-new-domain-ha-2-dc"
+		}
+	}
+}

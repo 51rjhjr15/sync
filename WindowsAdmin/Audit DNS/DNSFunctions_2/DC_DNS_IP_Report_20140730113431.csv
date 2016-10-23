@@ -1,0 +1,5 @@
+"DC","Domain","DNSHostName","IPAddress","DNSServerAddresses","DNSServerSearchOrder","Forwarders","BootMethod","ScavengingInterval"
+"CVDC1","cohovineyard.com","CVDC1","10.12.1.1 fe80::180c:32bc:1c68:bece","fe80::180c:32bc:1c68:bece 10.12.1.1","10.12.1.1 10.9.1.1",,"3","168"
+"CVDCR2","cohovineyard.com","CVDCR2","10.9.1.1 fe80::68ae:37a5:e52a:25f4","fe80::68ae:37a5:e52a:25f4 10.9.1.1","10.9.1.1 10.12.1.1 12.1.1.1","10.9.8.7","3","0"
+"CVDC1-CL0001","cohovineyard.com",,,,,,,
+"DCA","wingtiptoys.local","dcA","10.12.20.82 fe80::38ef:e4b5:4f41:2987","fe80::38ef:e4b5:4f41:2987 10.12.20.82","10.12.20.82","10.5.2.1 10.5.1.1","3","0"

@@ -1,0 +1,78 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+	"parameters": {
+		"sharepointFarmName" : {
+			"value": "SPFarm"
+		},
+		"newStorageAccountName": {
+			"value": "amitharjanistorage1"
+		},
+		"storageAccountType": {
+			"value": "Standard_LRS"
+		},
+		"location": {
+			"value": "East Asia"
+		},
+		"adminUsername": {
+			"value": "spAdministrator"
+		},
+		"adminPassword": {
+			"value": "P@ssw0rd123"
+		},
+		"adVMSize": {
+			"value": "Standard_D2"
+		},
+		"sqlVMSize": {
+			"value": "Standard_D2"
+		},
+		"spVMSize": {
+			"value": "Standard_D3"
+		},
+		"domainName": {
+			"value": "spdomain123.com"
+		},
+		"sqlServerServiceAccountUserName": {
+			"value": "sqlservice"
+		},
+		"sqlServerServiceAccountPassword": {
+			"value": "P@ssw0rd123"
+		},
+		"sharePointSetupUserAccountUserName": {
+			"value": "spsetup"
+		},
+		"sharePointSetupUserAccountPassword": {
+			"value": "P@ssw0rd123"
+		},
+		"sharePointFarmAccountUserName": {
+			"value": "spfarm"
+		},
+		"sharePointFarmAccountPassword": {
+			"value": "P@ssw0rd123"
+		},
+		"sharePointFarmPassphrasePassword": {
+			"value": "P@ssw0rd123"
+		},
+		"configDatabaseName": {
+			"value": "SP_Config"
+		},
+		"administrationContentDatabaseName": {
+			"value": "SP_AdminContent"
+		},
+		"contentDatabaseName": {
+			"value": "spARM_Content"
+		},
+		"spSiteTemplateName": {
+			"value": "STS0"
+		},
+		"adDNSPrefix": {
+			"value": "ad456"
+		},
+		"sqlDNSPrefix": {
+			"value": "sql456"
+		},
+		"spDNSPrefix": {
+			"value": "sp456"
+		}
+	}
+}

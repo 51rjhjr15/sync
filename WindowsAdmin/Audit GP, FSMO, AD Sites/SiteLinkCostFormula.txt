@@ -1,0 +1,1 @@
+=ROUNDDOWN(1024/(LOG(link speed in KBPS)),-2)

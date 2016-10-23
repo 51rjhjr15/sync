@@ -1,0 +1,6 @@
+\\server1\share1
+\\server1\share2
+\\server2.contoso.com\shareA
+S:\Shares\DeptA
+S:\Shares\DeptB
+U:\Shares\Users
